@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "esnext",      // Или es2020, es2022, esnext
+    "module": "esnext",       // Или es2020, es2022, esnext, nodenext, system
+    "moduleResolution": "node", // Важно для правильной работы модулей
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    // ... другие опции
+  }
+}

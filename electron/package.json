@@ -1,0 +1,16 @@
+{
+  "name": "nx-toolkit-e",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dev.ts",
+  "scripts": {
+    "pwaDev": "electron ."
+  },
+  "author": "Daniel_Cap",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "fs-extra": "^11.3.2"
+  }
+}
