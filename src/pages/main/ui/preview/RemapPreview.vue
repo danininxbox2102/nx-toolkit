@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {useGameFilesStore} from "@/stores/gameInfo.ts";
+import {useGameFilesStore, useGameIdStore} from "@/stores/gameInfo.ts";
 
 const remap = ref<string[]>([])
 
@@ -9,8 +9,16 @@ const gameFilesStore = useGameFilesStore();
 
 gameFilesStore.$subscribe(() => {
   const arr:string[] = []
+  let lastDlcIndex = 0;
+
   gameFilesStore.getMap().forEach((value, key) => {
-    arr.push(`${key} -> ${JSON.stringify(value)}`)
+    let filename = value.file
+
+    filename = filename.replace("$i", String(lastDlcIndex)).replace("$gameId", useGameIdStore().getId() || "")
+
+    if (value.type === "dlc") lastDlcIndex++;
+
+    arr.push(`${key} -> ${filename}`)
   })
   remap.value = arr
 })

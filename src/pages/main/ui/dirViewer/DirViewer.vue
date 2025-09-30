@@ -2,14 +2,12 @@
 import DirEntry from "@/pages/main/ui/dirViewer/DirEntry.vue";
 import FileEntry from "@/pages/main/ui/dirViewer/FileEntry.vue";
 import {onMounted, ref} from "vue";
+import type {Folder,File} from "@/interfaces/FS.ts";
 
 const props = defineProps<{dirPath: string|null, gameId: string}>()
 
-// const folders = ['atmosphere']
-// const files = ['Game Name [sj92hq9dfjg3]v0.nsp', 'Game Name [sj92hq9dfjg3]v14163.nsp','Game  DLC [Aboba bebra] [sj92hq9dfjg3].nsp']
-
-const folders = ref<string[]>([]);
-const files = ref<string[]>([]);
+const folders = ref<Folder[]>([]);
+const files = ref<File[]>([]);
 
 const loading = ref(true)
 
@@ -20,8 +18,9 @@ onMounted(async () => {
   console.log("dirPath: ", props.dirPath);
 
   const entries = await window.electronAPI.getEntries(props.dirPath)
-  folders.value = entries.folders
-  files.value = entries.files
+  console.log("entries: ", entries);
+  folders.value = entries.folders as Folder[]
+  files.value = entries.files as File[]
   loading.value = false
 })
 
@@ -30,8 +29,8 @@ onMounted(async () => {
 <template>
   <div class="entries">
     <div v-if="!loading">
-      <DirEntry v-for="folder in folders" :key="folders.indexOf(folder)" :file-name="folder"></DirEntry>
-      <FileEntry v-for="file in files" :key="files.indexOf(file)" :file-name="file"></FileEntry>
+      <DirEntry v-for="folder in folders" :key="folders.indexOf(folder)" :folder="folder" :i="0"></DirEntry>
+      <FileEntry v-for="file in files" :key="files.indexOf(file)" :file-name="file.name" :i="0"></FileEntry>
     </div>
   </div>
 </template>
@@ -39,12 +38,13 @@ onMounted(async () => {
 <style scoped>
 
 .entries{
-  margin-top: 15px;
-  width: 60%;
-  flex-shrink: 0;
-  padding-left: 20px;
-  display: flex;
   flex-direction: column;
+  overflow-y: scroll;
+  padding-left: 20px;
+  margin-top: 15px;
+  flex-shrink: 0;
+  display: flex;
+  width: 60%;
 }
 
 </style>

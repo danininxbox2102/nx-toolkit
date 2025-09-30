@@ -1,25 +1,29 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type {GameContent, GameFile} from "@/interfaces/GameData.ts";
+import type {GameFile} from "@/interfaces/GameData.ts";
 
 export const useGameIdStore = defineStore('gameId', () => {
-  const gameId = ref("")
+  const gameId = ref<string|undefined>("")
 
   function setId(id: string) {
     gameId.value = id
+  }
+
+  function deleteId() {
+    gameId.value = undefined
   }
 
   function getId() {
     return gameId.value
   }
 
-  return { gameId, setId, getId };
+  return { gameId, setId, getId, deleteId };
 })
 
 export const useGameFilesStore = defineStore('gameFiles', () => {
-  const gameFileMap = ref<Map<string, GameFile|GameContent>>(new Map<string, GameFile | GameContent>())
+  const gameFileMap = ref<Map<string, GameFile>>(new Map<string, GameFile>())
 
-  function setMap(files: Map<string, GameFile|GameContent>) {
+  function setMap(files: Map<string, GameFile>) {
     gameFileMap.value = files
   }
 
@@ -27,7 +31,7 @@ export const useGameFilesStore = defineStore('gameFiles', () => {
     return gameFileMap.value
   }
 
-  function set(fileName:string, mapTo:GameFile|GameContent) {
+  function set(fileName:string, mapTo:GameFile) {
     gameFileMap.value.set(fileName, mapTo)
   }
 
@@ -36,18 +40,4 @@ export const useGameFilesStore = defineStore('gameFiles', () => {
   }
 
   return { gameFileMap, setMap, getMap, set, remove };
-})
-
-export const useGameAtmosphereStore = defineStore('gameFiles', () => {
-  const atmosphereFiles = ref<string[]>([])
-
-  function setFiles(files: Array<string>) {
-    atmosphereFiles.value = files
-  }
-
-  function getFiles() {
-    return atmosphereFiles.value
-  }
-
-  return { atmosphereFiles, setFiles, getFiles };
 })

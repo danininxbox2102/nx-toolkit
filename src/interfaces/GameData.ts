@@ -1,16 +1,16 @@
 export interface GameFile{
-  name: string;
+  type:"base"|"update"|"dlc"|"atmosphere"|"delete";
+  file: string;
+  name?: string;
 }
 
-export interface GameContent{
-  type: string;
-  name: string;
-}
+
 
 export interface GameInfo {
   createdAt?: number;
   createdAtDate?: string;
   gameId?: string;
-  gameFiles?: Array<GameFile|GameContent>;
+  gameFiles?: Array<GameFile>;
+  optionalFiles?: Array<GameFile>;
   atmosphere?: string[];
 }

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
 import ManifestPreview from "@/pages/main/ui/preview/ManifestPreview.vue";
-import MenuGameId from "@/pages/main/ui/MenuGameId.vue";
-import {useGameIdStore} from "@/stores/gameInfo.ts";
+import MenuGameId from "@/widgets/MenuGameId.vue";
+import {useGameFilesStore, useGameIdStore} from "@/stores/gameInfo.ts";
 import {ref} from "vue";
 import DirViewer from "@/pages/main/ui/dirViewer/DirViewer.vue";
 
@@ -13,16 +13,26 @@ const dirPath = ref<string|null>(null)
 const gameId = ref("")
 
 const setGameId = () => {
-  gameId.value = useGameIdStore().getId();
+  gameId.value = useGameIdStore().getId()||"";
   showGameIdMenu.value = false
 }
 
+const reset = () => {
+  useGameIdStore().deleteId()
+  useGameFilesStore().setMap(new Map())
+  showTiles.value = false;
+}
+
 const setDirPath = (path: string) => {
+  reset()
   dirPath.value = path;
+  showTiles.value = true;
   showGameIdMenu.value = true
 }
 
 const showGameIdMenu = ref(false);
+
+const showTiles = ref(true)
 
 </script>
 
@@ -30,7 +40,7 @@ const showGameIdMenu = ref(false);
   <div class="main">
     <NavBar :dir-path="dirPath" :game-id="gameId" @select="setDirPath"></NavBar>
     <hr>
-    <div class="tiles-wrapper">
+    <div class="tiles-wrapper" v-if="showTiles">
       <div class="tiles" v-if="dirPath">
         <MenuGameId  @select="setGameId" v-if="showGameIdMenu"></MenuGameId>
         <DirViewer :dir-path="dirPath" :game-id="gameId"></DirViewer>
@@ -46,6 +56,7 @@ const showGameIdMenu = ref(false);
 <style scoped>
 
 .tiles-wrapper {
+  overflow: hidden;
   height: 100%;
 }
 
@@ -71,5 +82,6 @@ hr{
   flex-direction: column;
   width: 100%;
   height: 100%;
+  max-height: 100vh;
 }
 </style>

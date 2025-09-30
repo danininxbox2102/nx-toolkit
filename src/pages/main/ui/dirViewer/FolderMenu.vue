@@ -32,7 +32,7 @@ onUnmounted(() => {
 
 const removeTakenTypes = () => {
   const values = Array.from(useGameFilesStore().getMap().values())
-  const taken = values.map(value => Object.keys(value)[0])
+  const taken = values.map(value => value.type)
   const types = [...props.types]
 
   types.splice(props.selected, 1)

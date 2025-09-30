@@ -3,22 +3,7 @@ import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import {useGameFilesStore, useGameIdStore} from "@/stores/gameInfo.ts";
 import {ref} from "vue";
-import type {GameInfo} from "@/interfaces/GameData.ts";
-
-// const example = {
-//   "createdAt": 1758740487143,
-//   "createdAtDate": "Wed Sep 24 2025 22:01:27 GMT+0300 (Moscow Standard Time)",
-//   "gameId": "ac-ezio",
-//   "gameFiles":[
-//     {"base":"ac-ezio-base.nsz"},
-//     {"update":"ac-ezio-update.nsz"},
-//     {"dlc":"ac-ezio-dlc1.nsz","name":"DLC Brotherhood"},
-//     {"dlc":"ac-ezio-dlc2.nsz","name":"DLC Embers"},
-//     {"dlc":"ac-ezio-dlc3.nsz","name":"DLC Lineage"},
-//     {"dlc":"ac-ezio-dlc4.nsz","name":"DLC Revelations"},
-//     {"dlc":"ac-ezio-dlc5.nsz","name":"DLC Voice Audio Package"}
-//   ]
-// }
+import type {GameFile, GameInfo} from "@/interfaces/GameData.ts";
 
 console.log("aaaa")
 
@@ -48,9 +33,34 @@ const update = () => {
   }
 
   if (gameFilesStore.getMap().size > 0) {
-
     const map = gameFilesStore.getMap();
-    data.value["gameFiles"] = Array.from(map.values());
+    console.log("map:",map)
+    const gameFiles:Array<GameFile> = [];
+    const optionalFiles:Array<GameFile> = [];
+
+    let lastDlcIndex = 0;
+
+    map.forEach((gameFile:GameFile) => {
+      const file = Object.create(gameFile);
+      Object.assign(file, gameFile);
+      if (file.type === "dlc") {
+        file.file = file.file.replace("$i", String(lastDlcIndex)).replace("$gameId", useGameIdStore().getId() || "")
+        optionalFiles.push(file);
+        lastDlcIndex++;
+        return;
+      }
+
+      if (file.type === "atmosphere") {
+        optionalFiles.push(file);
+        return;
+      }
+
+      file.file = file.file.replace("$gameId", String(gameIdStore.getId()));
+      gameFiles.push(file);
+    })
+
+    data.value["gameFiles"] = gameFiles;
+    data.value["optionalFiles"] = optionalFiles;
   }
 }
 
@@ -78,11 +88,12 @@ const update = () => {
 <style scoped>
 
 .cont{
-  width: 99%;
   border-left: #171717 solid 2px;
-  height: 80%;
-  color: #fff;
   overflow-y: scroll;
+  max-height: 80%;
+  height: 100%;
+  color: #fff;
+  width: 99%;
 }
 
 .vjs-key {

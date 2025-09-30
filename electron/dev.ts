@@ -3,9 +3,24 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import * as path from "node:path";
 import fs from "fs-extra";
-import {describe} from "node:test";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+interface File {
+  name: string;
+  fullPath: string;
+}
+
+interface Folder {
+  name: string;
+  fullPath: string;
+  children: FolderContents;
+}
+
+interface FolderContents {
+  folders: Folder[],
+  files: File[]
+}
 
 
 const createWindow = () => {
@@ -32,26 +47,44 @@ ipcMain.handle('open-folder', () => {
   })
 });
 
+
+
+const readDir = (folderPath:string) => {
+  const entries:FolderContents = {folders: [], files: []};
+
+  try {
+    fs.readdirSync(folderPath).forEach(arg => {
+      const entry = arg as never as string;
+
+      const filePath = path.join(folderPath, entry);
+
+      const stat = fs.lstatSync(filePath)
+      if (stat.isDirectory()) {
+        const folder:Folder = {name:entry, children:{folders:[],files:[]}, fullPath:""};
+        folder.children = readDir(filePath)
+        folder.fullPath = filePath;
+        entries.folders.push(folder);
+        return;
+      }
+
+      if (stat.isFile()) {
+        entries.files.push({name:entry,fullPath:filePath});
+        return;
+      }
+    })
+  } catch (error) {
+    console.error(error);
+  }
+
+  return entries;
+}
+
 ipcMain.handle('get-entries', (event,dirPath) => {
   if (dirPath === "") {
     console.error("dirPath is empty");
     return null;
   }
 
-  const entries:{folders: string[], files: string[]} = {folders: [], files: []};
-
-  fs.readdirSync(dirPath).forEach(file => {
-      const stat = fs.lstatSync(path.join(dirPath, file))
-      if (stat.isDirectory()) {
-        entries.folders.push(file);
-        return;
-      }
-      if (stat.isFile()) {
-        entries.files.push(file);
-        return;
-      }
-    })
-
-  return entries;
+  return readDir(dirPath);
 });
 
