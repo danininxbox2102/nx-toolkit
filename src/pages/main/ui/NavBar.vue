@@ -2,6 +2,7 @@
 import FolderIcon from '@/assets/svg/folder.svg'
 import {ref} from "vue";
 import {useGameIdStore} from "@/stores/gameInfo.ts";
+import {validateGameId} from "@/utils/Validate.ts";
 
 const props = defineProps<{dirPath: string|null, gameId: string}>()
 const emit = defineEmits(["select"])
@@ -27,9 +28,11 @@ const gameIdInp = ref()
 
 const setGameId = async () => {
   if (!gameIdInp.value) return
+  gameIdInp.value.value = validateGameId(gameIdInp.value.value)
 
   useGameIdStore().setId(gameIdInp.value.value)
 }
+
 
 </script>
 

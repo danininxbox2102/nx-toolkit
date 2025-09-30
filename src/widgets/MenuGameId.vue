@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {useGameIdStore} from "@/stores/gameInfo.ts";
 import {ref} from "vue";
+import {validateGameId} from "@/utils/Validate.ts";
 
 const emit = defineEmits(['select'])
 
@@ -14,13 +15,18 @@ const save = (): void => {
   emit("select");
 }
 
+const validate = (): void => {
+  if (!inputRef.value) return;
+  inputRef.value.value = validateGameId(inputRef.value.value)
+}
+
 </script>
 
 <template>
   <div class="background">
     <div class="menu">
       <div class="title">Введите Game ID</div>
-      <input type="text" ref="inputRef" @keydown.enter="save">
+      <input type="text" ref="inputRef" @keydown.enter="save" @input="validate">
       <div class="confirm-btn" @click="save">Продолжить</div>
     </div>
   </div>

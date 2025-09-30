@@ -62,6 +62,7 @@ const update = () => {
     case 2:
       //Ignore
       entryStyle.value = ''
+      displayText.value = props.folder.name
       entryIcon.value = FileIcon
       removeFromStore()
       break;
